@@ -1,505 +1,514 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Buzón CUC Escucha</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --red:     #C8102E;
-      --red-dark:#9B0C23;
-      --cream:   #FAF7F2;
-      --warm:    #F0EAE0;
-      --dark:    #1A1209;
-      --mid:     #5C4A38;
-      --accent:  #E8B84B;
+      --blue:      #003087;
+      --blue-mid:  #0050B3;
+      --blue-light:#E8F0FA;
+      --blue-pale: #F0F5FF;
+      --red:       #C8102E;
+      --white:     #FFFFFF;
+      --gray:      #F4F6F9;
+      --border:    #D0DAE8;
+      --text:      #1A2340;
+      --muted:     #5A6A8A;
+      --gold:      #C89B30;
     }
-
-    html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      color: var(--dark);
+      font-family: 'Source Sans 3', sans-serif;
+      background: var(--gray);
+      color: var(--text);
       min-height: 100vh;
-      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* ── NOISE TEXTURE overlay ── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── HEADER ── */
-    header {
-      position: relative;
-      background: var(--red);
-      overflow: hidden;
-      padding: 0;
-    }
-
-    .header-bg-shape {
-      position: absolute;
-      bottom: -60px; right: -80px;
-      width: 420px; height: 420px;
-      background: var(--red-dark);
-      border-radius: 50%;
-      opacity: 0.5;
-    }
-    .header-bg-shape2 {
-      position: absolute;
-      top: -40px; left: -60px;
-      width: 260px; height: 260px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 50%;
-    }
-
-    .header-inner {
-      position: relative;
-      z-index: 1;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 56px 40px 48px;
+    /* ── TOP BAR ── */
+    .topbar {
+      background: var(--blue);
+      padding: 10px 40px;
       display: flex;
       align-items: center;
-      gap: 36px;
+      justify-content: space-between;
+      animation: fadeDown 0.5s ease both;
     }
 
-    .cuc-badge {
-      flex-shrink: 0;
-      width: 70px; height: 70px;
-      background: #fff;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Playfair Display', serif;
-      font-weight: 900;
-      font-size: 22px;
-      color: var(--red);
-      letter-spacing: -1px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-      animation: popIn 0.6s cubic-bezier(.34,1.56,.64,1) both;
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
 
-    .header-text { animation: slideUp 0.7s 0.1s ease both; }
-
-    .header-eyebrow {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.65);
-      margin-bottom: 10px;
-    }
-
-    .header-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(28px, 5vw, 46px);
-      font-weight: 900;
-      color: #fff;
-      line-height: 1.05;
-    }
-
-    .header-title span {
-      color: var(--accent);
-    }
-
-    .header-sub {
-      margin-top: 12px;
-      font-size: 14px;
-      color: rgba(255,255,255,0.75);
-      font-weight: 300;
-      max-width: 480px;
-      line-height: 1.6;
-    }
-
-    /* ── DECORATIVE STRIPE ── */
-    .stripe {
-      height: 6px;
-      background: linear-gradient(90deg, var(--accent) 0%, var(--red) 50%, var(--dark) 100%);
-    }
-
-    /* ── MAIN LAYOUT ── */
-    main {
-      position: relative;
-      z-index: 1;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 60px 40px 80px;
-      display: grid;
-      grid-template-columns: 1fr 1.6fr;
-      gap: 60px;
-      align-items: start;
-    }
-
-    /* ── ASIDE ── */
-    aside { animation: slideUp 0.8s 0.2s ease both; }
-
-    .aside-label {
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--red);
-      margin-bottom: 16px;
-    }
-
-    .aside-heading {
-      font-family: 'Playfair Display', serif;
-      font-size: 26px;
+    .cuc-logo {
+      background: var(--white);
+      color: var(--blue);
+      font-family: 'Merriweather', serif;
       font-weight: 700;
-      color: var(--dark);
-      line-height: 1.25;
+      font-size: 16px;
+      padding: 4px 12px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+
+    .topbar-name {
+      color: rgba(255,255,255,0.85);
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+
+    .topbar-right {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-mid) 100%);
+      padding: 56px 40px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeDown 0.6s 0.1s ease both;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      border: 40px solid rgba(255,255,255,0.05);
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -40px;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      border: 30px solid rgba(255,255,255,0.04);
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 16px;
+      border-radius: 20px;
       margin-bottom: 20px;
     }
 
-    .aside-body {
-      font-size: 14px;
-      color: var(--mid);
-      line-height: 1.75;
+    .hero h1 {
+      font-family: 'Merriweather', serif;
+      font-size: clamp(26px, 4vw, 42px);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+
+    .hero h1 span { color: var(--gold); }
+
+    .hero-sub {
+      font-size: 15px;
+      color: rgba(255,255,255,0.75);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* ── GOLD LINE ── */
+    .gold-line {
+      height: 4px;
+      background: linear-gradient(90deg, var(--blue) 0%, var(--gold) 50%, var(--blue) 100%);
+    }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      max-width: 700px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 48px 24px 64px;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    /* ── INFO BOXES ── */
+    .info-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
       margin-bottom: 32px;
     }
 
-    .pillars {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    .info-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--blue-mid);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
     }
 
-    .pillar {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      background: var(--warm);
-      border-left: 3px solid var(--red);
-      border-radius: 0 8px 8px 0;
-      padding: 12px 14px;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .pillar:hover { transform: translateX(4px); box-shadow: -3px 0 0 var(--accent); }
-
-    .pillar-icon {
-      font-size: 18px;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .pillar-text {
-      font-size: 13px;
-      color: var(--mid);
-      line-height: 1.55;
-    }
-
-    .pillar-text strong { color: var(--dark); display: block; margin-bottom: 2px; }
+    .info-box-icon { font-size: 22px; margin-bottom: 6px; }
+    .info-box-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .info-box-value { font-size: 13px; font-weight: 600; color: var(--blue); }
 
     /* ── FORM CARD ── */
     .form-card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 40px 36px;
-      box-shadow: 0 8px 48px rgba(26,18,9,0.10), 0 1px 0 rgba(26,18,9,0.04);
-      animation: slideUp 0.8s 0.3s ease both;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,48,135,0.08);
+    }
+
+    .form-card-header {
+      background: var(--blue-light);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .form-card-icon {
+      width: 42px; height: 42px;
+      background: var(--blue);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
     }
 
     .form-card-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
+      font-family: 'Merriweather', serif;
+      font-size: 17px;
       font-weight: 700;
-      color: var(--dark);
-      margin-bottom: 6px;
+      color: var(--blue);
     }
 
     .form-card-sub {
-      font-size: 13px;
-      color: var(--mid);
-      margin-bottom: 30px;
-      line-height: 1.55;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
     }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px 20px;
-    }
+    .form-body { padding: 28px; }
+
+    /* ── FIELDS ── */
+    .fields { display: flex; flex-direction: column; gap: 20px; }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
     .field { display: flex; flex-direction: column; gap: 6px; }
-    .field.full { grid-column: 1 / -1; }
 
     label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--mid);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.3px;
     }
+
+    label .req { color: var(--red); margin-left: 2px; }
 
     input, select, textarea {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Source Sans 3', sans-serif;
       font-size: 14px;
-      color: var(--dark);
-      background: var(--cream);
-      border: 1.5px solid var(--warm);
-      border-radius: 10px;
-      padding: 11px 14px;
+      color: var(--text);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
       width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    input::placeholder, textarea::placeholder { color: #bbb; }
+    input::placeholder, textarea::placeholder { color: #B0BAC9; }
 
     input:focus, select:focus, textarea:focus {
-      border-color: var(--red);
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(200,16,46,0.10);
+      border-color: var(--blue-mid);
+      box-shadow: 0 0 0 3px rgba(0,80,179,0.1);
     }
 
-    select { appearance: none; cursor: pointer; }
-
-    .select-wrap { position: relative; }
-    .select-wrap::after {
-      content: '▾';
-      position: absolute;
-      right: 14px; top: 50%;
-      transform: translateY(-50%);
-      color: var(--mid);
-      pointer-events: none;
-      font-size: 13px;
+    select {
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235A6A8A' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
     }
 
     textarea {
       resize: vertical;
-      min-height: 110px;
-      line-height: 1.6;
+      min-height: 120px;
+      line-height: 1.65;
     }
 
-    /* category pills */
-    .category-wrap {
+    /* ── CATEGORY ── */
+    .pills {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .cat-pill {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .pill { cursor: pointer; }
+    .pill input[type="radio"] { display: none; }
 
-    .cat-pill input[type="radio"] { display: none; }
-
-    .cat-pill span {
+    .pill span {
+      display: block;
       font-size: 12px;
       font-weight: 500;
-      color: var(--mid);
-      background: var(--warm);
-      border: 1.5px solid var(--warm);
-      border-radius: 20px;
-      padding: 5px 13px;
+      color: var(--muted);
+      background: var(--gray);
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 12px;
       transition: all 0.18s;
+      user-select: none;
     }
 
-    .cat-pill input:checked + span {
-      background: var(--red);
-      border-color: var(--red);
+    .pill:hover span { border-color: var(--blue-mid); color: var(--blue-mid); }
+
+    .pill input:checked + span {
+      background: var(--blue);
+      border-color: var(--blue);
       color: #fff;
     }
 
-    .cat-pill:hover span { border-color: var(--red); color: var(--red); }
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4px 0;
+    }
 
-    /* submit btn */
-    .btn-submit {
-      margin-top: 26px;
-      width: 100%;
-      padding: 15px;
-      background: var(--red);
+    /* ── SUBMIT ── */
+    .btn-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .btn-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 260px;
+    }
+
+    .btn {
+      flex-shrink: 0;
+      padding: 12px 28px;
+      background: var(--blue);
       color: #fff;
       border: none;
-      border-radius: 12px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
+      border-radius: 6px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 16px rgba(200,16,46,0.28);
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0,48,135,0.25);
     }
 
-    .btn-submit:hover {
-      background: var(--red-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(200,16,46,0.36);
+    .btn:hover {
+      background: var(--blue-mid);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0,48,135,0.3);
     }
 
-    .btn-submit:active { transform: translateY(0); }
+    .btn:active { transform: translateY(0); }
 
-    .btn-icon { font-size: 18px; }
-
-    /* ── SUCCESS MESSAGE ── */
+    /* ── SUCCESS ── */
     .success {
       display: none;
       flex-direction: column;
       align-items: center;
       text-align: center;
       padding: 20px 0 10px;
-      animation: popIn 0.5s ease;
+      animation: fadeUp 0.5s ease both;
     }
 
     .success-icon {
-      font-size: 52px;
-      margin-bottom: 16px;
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: #EAF7EE;
+      border: 2px solid #5CB87A;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      margin-bottom: 18px;
     }
 
     .success h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: var(--dark);
-      margin-bottom: 8px;
+      font-family: 'Merriweather', serif;
+      font-size: 20px;
+      color: var(--blue);
+      margin-bottom: 10px;
     }
 
     .success p {
       font-size: 14px;
-      color: var(--mid);
-      line-height: 1.65;
-      max-width: 300px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 340px;
     }
 
-    .btn-reset {
-      margin-top: 24px;
-      padding: 10px 28px;
-      border: 1.5px solid var(--red);
-      color: var(--red);
+    .btn-ghost {
+      margin-top: 22px;
+      padding: 10px 24px;
+      border: 1.5px solid var(--blue);
+      color: var(--blue);
       background: transparent;
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
+      border-radius: 6px;
+      font-family: 'Source Sans 3', sans-serif;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .btn-reset:hover { background: var(--red); color: #fff; }
+    .btn-ghost:hover { background: var(--blue); color: #fff; }
 
     /* ── FOOTER ── */
     footer {
-      position: relative; z-index: 1;
+      background: var(--blue);
+      padding: 20px 40px;
       text-align: center;
-      padding: 24px 40px;
-      border-top: 1px solid var(--warm);
       font-size: 12px;
-      color: #aaa;
-      letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.3px;
+      line-height: 1.8;
     }
 
-    footer strong { color: var(--mid); }
+    footer strong { color: rgba(255,255,255,0.85); }
 
     /* ── ANIMATIONS ── */
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(28px); }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(0.85); }
-      to   { opacity: 1; transform: scale(1); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 700px) {
-      .header-inner { flex-direction: column; align-items: flex-start; gap: 20px; padding: 40px 24px 36px; }
-      main { grid-template-columns: 1fr; gap: 40px; padding: 40px 24px 60px; }
-      .form-grid { grid-template-columns: 1fr; }
-      .form-card { padding: 28px 22px; }
+    @media (max-width: 600px) {
+      .topbar { padding: 10px 20px; }
+      .hero { padding: 40px 24px 36px; }
+      .info-row { grid-template-columns: 1fr; }
+      .form-body { padding: 20px; }
+      .row { grid-template-columns: 1fr; }
+      .btn-row { flex-direction: column; align-items: stretch; }
+      .btn-note { max-width: 100%; }
+      footer { padding: 20px; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="header-bg-shape"></div>
-  <div class="header-bg-shape2"></div>
-  <div class="header-inner">
-    <div class="cuc-badge">CUC</div>
-    <div class="header-text">
-      <p class="header-eyebrow">Universidad de la Costa · Facultad de Ingeniería</p>
-      <h1 class="header-title">Buzón <span>CUC</span> Escucha</h1>
-      <p class="header-sub">Tu voz importa. Comparte ideas para mejorar la experiencia universitaria: bienestar, clases, servicios, inclusión y más.</p>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="cuc-logo">CUC</span>
+    <span class="topbar-name">Universidad de la Costa</span>
+  </div>
+  <span class="topbar-right">Barranquilla, Colombia · 2026-1</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Facultad de Ingeniería</div>
+  <h1>Buzón <span>CUC</span> Escucha</h1>
+  <p class="hero-sub">Comparte tus ideas para mejorar la experiencia universitaria. Cada sugerencia es revisada por la Facultad de Ingeniería.</p>
+</div>
+
+<div class="gold-line"></div>
+
+<!-- MAIN -->
+<main>
+
+  <div class="info-row">
+    <div class="info-box">
+      <div class="info-box-icon">🎓</div>
+      <div class="info-box-label">Dirigido a</div>
+      <div class="info-box-value">Estudiantes CUC</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-icon">🔒</div>
+      <div class="info-box-label">Privacidad</div>
+      <div class="info-box-value">Uso confidencial</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-icon">📋</div>
+      <div class="info-box-label">Revisado por</div>
+      <div class="info-box-value">Fac. Ingeniería</div>
     </div>
   </div>
-</header>
-
-<div class="stripe"></div>
-
-<main>
-  <aside>
-    <p class="aside-label">¿Por qué participar?</p>
-    <h2 class="aside-heading">Construimos una mejor CUC juntos</h2>
-    <p class="aside-body">Cada sugerencia es revisada por la Facultad de Ingeniería. Tu opinión impulsa cambios reales en el campus.</p>
-    <div class="pillars">
-      <div class="pillar">
-        <span class="pillar-icon">🎓</span>
-        <div class="pillar-text">
-          <strong>Calidad académica</strong>
-          Propón mejoras en metodologías, horarios y recursos de clase.
-        </div>
-      </div>
-      <div class="pillar">
-        <span class="pillar-icon">🤝</span>
-        <div class="pillar-text">
-          <strong>Inclusión y bienestar</strong>
-          Comparte ideas para un campus más accesible y equitativo.
-        </div>
-      </div>
-      <div class="pillar">
-        <span class="pillar-icon">🏛️</span>
-        <div class="pillar-text">
-          <strong>Infraestructura</strong>
-          Sugiere mejoras en espacios, equipos y servicios del campus.
-        </div>
-      </div>
-      <div class="pillar">
-        <span class="pillar-icon">💬</span>
-        <div class="pillar-text">
-          <strong>Comunidad</strong>
-          Fomenta actividades, eventos y vínculos entre estudiantes.
-        </div>
-      </div>
-    </div>
-  </aside>
 
   <div class="form-card">
-    <h2 class="form-card-title">Deja tu sugerencia</h2>
-    <p class="form-card-sub">Todos los campos son requeridos. Tu identidad es confidencial.</p>
+    <div class="form-card-header">
+      <div class="form-card-icon">📬</div>
+      <div>
+        <div class="form-card-title">Formulario de sugerencias</div>
+        <div class="form-card-sub">Todos los campos son obligatorios</div>
+      </div>
+    </div>
 
-    <form id="buzonForm" novalidate>
-      <div class="form-grid">
+    <div class="form-body">
+      <form id="buzonForm" novalidate>
+        <div class="fields">
 
-        <div class="field full">
-          <label for="nombre">Nombre completo</label>
-          <input type="text" id="nombre" name="nombre" placeholder="Ej. María Fernanda López" required />
-        </div>
+          <div class="field">
+            <label for="nombre">Nombre completo <span class="req">*</span></label>
+            <input type="text" id="nombre" placeholder="Ej. María Fernanda López" required/>
+          </div>
 
-        <div class="field">
-          <label for="correo">Correo institucional</label>
-          <input type="email" id="correo" name="correo" placeholder="usuario@cuc.edu.co" required />
-        </div>
+          <div class="row">
+            <div class="field">
+              <label for="correo">Correo institucional <span class="req">*</span></label>
+              <input type="email" id="correo" placeholder="usuario@cuc.edu.co" required/>
+            </div>
+            <div class="field">
+              <label for="semestre">Semestre actual <span class="req">*</span></label>
+              <select id="semestre" required>
+                <option value="" disabled selected>Selecciona</option>
+                <option>1°</option><option>2°</option><option>3°</option>
+                <option>4°</option><option>5°</option><option>6°</option>
+                <option>7°</option><option>8°</option><option>9°</option><option>10°</option>
+              </select>
+            </div>
+          </div>
 
-        <div class="field">
-          <label for="programa">Programa académico</label>
-          <div class="select-wrap">
-            <select id="programa" name="programa" required>
+          <div class="field">
+            <label for="programa">Programa académico <span class="req">*</span></label>
+            <select id="programa" required>
               <option value="" disabled selected>Selecciona tu programa</option>
               <optgroup label="Ingeniería">
                 <option>Ingeniería de Sistemas</option>
@@ -514,7 +523,7 @@
                 <option>Contaduría Pública</option>
                 <option>Economía</option>
               </optgroup>
-              <optgroup label="Derecho y Ciencias Políticas">
+              <optgroup label="Derecho">
                 <option>Derecho</option>
               </optgroup>
               <optgroup label="Arquitectura">
@@ -526,57 +535,51 @@
               <option value="otro">Otro programa</option>
             </select>
           </div>
-        </div>
 
-        <div class="field">
-          <label for="semestre">Semestre actual</label>
-          <div class="select-wrap">
-            <select id="semestre" name="semestre" required>
-              <option value="" disabled selected>Semestre</option>
-              <option>1°</option><option>2°</option><option>3°</option>
-              <option>4°</option><option>5°</option><option>6°</option>
-              <option>7°</option><option>8°</option><option>9°</option>
-              <option>10°</option>
-            </select>
+          <div class="field">
+            <label>Categoría de la sugerencia <span class="req">*</span></label>
+            <div class="pills">
+              <label class="pill"><input type="radio" name="cat" value="academico" required/><span>📚 Académico</span></label>
+              <label class="pill"><input type="radio" name="cat" value="bienestar"/><span>💚 Bienestar</span></label>
+              <label class="pill"><input type="radio" name="cat" value="infra"/><span>🏗️ Infraestructura</span></label>
+              <label class="pill"><input type="radio" name="cat" value="servicios"/><span>🛎️ Servicios</span></label>
+              <label class="pill"><input type="radio" name="cat" value="inclusion"/><span>🤝 Inclusión</span></label>
+              <label class="pill"><input type="radio" name="cat" value="otro"/><span>💡 Otro</span></label>
+            </div>
           </div>
-        </div>
 
-        <div class="field full">
-          <label>Categoría de la sugerencia</label>
-          <div class="category-wrap">
-            <label class="cat-pill"><input type="radio" name="categoria" value="academico" required/><span>📚 Académico</span></label>
-            <label class="cat-pill"><input type="radio" name="categoria" value="bienestar"/><span>💚 Bienestar</span></label>
-            <label class="cat-pill"><input type="radio" name="categoria" value="infraestructura"/><span>🏗️ Infraestructura</span></label>
-            <label class="cat-pill"><input type="radio" name="categoria" value="servicios"/><span>🛎️ Servicios</span></label>
-            <label class="cat-pill"><input type="radio" name="categoria" value="inclusion"/><span>🤝 Inclusión</span></label>
-            <label class="cat-pill"><input type="radio" name="categoria" value="otro"/><span>💡 Otro</span></label>
+          <div class="field">
+            <label for="mensaje">Tu sugerencia <span class="req">*</span></label>
+            <textarea id="mensaje" placeholder="Describe tu idea con detalle. ¿Qué mejorarías? ¿Cómo lo implementarías?" required></textarea>
           </div>
-        </div>
 
-        <div class="field full">
-          <label for="mensaje">Tu sugerencia</label>
-          <textarea id="mensaje" name="mensaje" placeholder="Describe tu idea con el mayor detalle posible. ¿Qué mejorarías? ¿Cómo lo implementarías?" required></textarea>
-        </div>
+          <hr class="divider"/>
 
+          <div class="btn-row">
+            <p class="btn-note">Al enviar confirmas que la información es verídica y será tratada de forma confidencial.</p>
+            <button type="submit" class="btn">
+              Enviar <span>→</span>
+            </button>
+          </div>
+
+        </div>
+      </form>
+
+      <div class="success" id="successMsg">
+        <div class="success-icon">✅</div>
+        <h3>¡Sugerencia enviada!</h3>
+        <p>Gracias por contribuir a mejorar la Universidad de la Costa. Tu mensaje será revisado por la Facultad de Ingeniería.</p>
+        <button class="btn-ghost" onclick="resetForm()">Enviar otra sugerencia</button>
       </div>
-
-      <button type="submit" class="btn-submit">
-        <span class="btn-icon">📬</span>
-        Enviar sugerencia
-      </button>
-    </form>
-
-    <div class="success" id="successMsg">
-      <div class="success-icon">✅</div>
-      <h3>¡Sugerencia enviada!</h3>
-      <p>Gracias por contribuir a mejorar la CUC. Tu mensaje ha sido recibido y será revisado por la Facultad de Ingeniería.</p>
-      <button class="btn-reset" onclick="resetForm()">Enviar otra sugerencia</button>
     </div>
   </div>
+
 </main>
 
+<!-- FOOTER -->
 <footer>
-  <strong>Buzón CUC Escucha</strong> · Universidad de la Costa · Departamento de Ciencias de la Computación y Electrónica · 2026-1
+  <strong>Buzón CUC Escucha</strong> · Universidad de la Costa<br/>
+  Departamento de Ciencias de la Computación y Electrónica · Ingeniería de Sistemas / Técnico de Desarrollo de Software · 2026-1
 </footer>
 
 <script>
@@ -585,26 +588,18 @@
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
-
-    // Basic validation
-    const nombre = document.getElementById('nombre').value.trim();
-    const correo = document.getElementById('correo').value.trim();
-    const programa = document.getElementById('programa').value;
+    const nombre   = document.getElementById('nombre').value.trim();
+    const correo   = document.getElementById('correo').value.trim();
     const semestre = document.getElementById('semestre').value;
-    const categoria = document.querySelector('input[name="categoria"]:checked');
-    const mensaje = document.getElementById('mensaje').value.trim();
+    const programa = document.getElementById('programa').value;
+    const cat      = document.querySelector('input[name="cat"]:checked');
+    const mensaje  = document.getElementById('mensaje').value.trim();
 
-    if (!nombre || !correo || !programa || !semestre || !categoria || !mensaje) {
+    if (!nombre || !correo || !semestre || !programa || !cat || !mensaje) {
       alert('Por favor completa todos los campos antes de enviar.');
       return;
     }
 
-    if (!correo.includes('@')) {
-      alert('Por favor ingresa un correo válido.');
-      return;
-    }
-
-    // Show success
     form.style.display = 'none';
     success.style.display = 'flex';
   });
